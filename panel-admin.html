@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Panel de administrador - PoliMarket</title>
+  <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="auth.js" defer></script>
   <script src="panel-admin.js" defer></script>
@@ -64,6 +65,8 @@
     <button class="item-sidebar" onclick="mostrarSeccion('seccionCategorias', this)">🏷️ Categorías</button>
     <button class="item-sidebar" onclick="mostrarSeccion('seccionProveedores', this)">🚚 Proveedores</button>
     <button class="item-sidebar" onclick="mostrarSeccion('seccionPedidos', this)">📋 Pedidos</button>
+    <button class="item-sidebar" onclick="mostrarSeccion('seccionMensajes', this)">💬 Mensajes</button>
+    <button class="item-sidebar" onclick="mostrarSeccion('seccionMensajes', this)">💬 Mensajes</button>
     <hr>
     <a href="index.html">← Volver al inicio</a>
     <a href="catalogo.html">Ver catálogo</a>
@@ -131,6 +134,16 @@
     <div id="seccionPedidos" class="panel-seccion">
       <h1>Pedidos</h1>
       <div id="listaPedidosAdmin"></div>
+    </div>
+
+    <div id="seccionMensajes" class="panel-seccion">
+      <h1>Mensajes</h1>
+
+      <h2>De soporte general</h2>
+      <div id="listaMensajesSoporte"></div>
+
+      <h2>A proveedores</h2>
+      <div id="listaMensajesProveedor"></div>
     </div>
   </main>
 

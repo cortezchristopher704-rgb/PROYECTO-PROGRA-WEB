@@ -3,6 +3,7 @@
 // ============================================
 
 let productoActualId = null;
+let proveedorActualId = null;
 let esAdminActual = false;
 
 // 0. Checar (sin redirigir a nadie) si quien ve la página es admin
@@ -37,7 +38,7 @@ async function cargarProducto() {
   const { data, error } = await supabaseClient
     .from("productos")
     .select(`
-      id, nombre, descripcion, precio, stock, imagen_url,
+      id, nombre, descripcion, precio, stock, imagen_url, proveedor_id,
       proveedores ( nombre, contacto ),
       producto_categorias ( categorias ( nombre ) )
     `)
@@ -57,6 +58,7 @@ let productoCompletoActual = null;
 
 function renderizarProducto(producto) {
   productoCompletoActual = producto;
+  proveedorActualId = producto.proveedor_id;
 
   const nombresCategorias = producto.producto_categorias
     .map((pc) => pc.categorias.nombre)
@@ -77,11 +79,66 @@ function renderizarProducto(producto) {
       <p>Proveedor: ${proveedorTexto}</p>
       <button onclick="agregarAlCarritoDesdeDetalle()">Agregar al carrito</button>
       <button onclick="agregarAFavoritosDesdeDetalle()">❤ Favorito</button>
+      <button onclick="mostrarFormularioContactoProveedor()">✉️ Contactar proveedor</button>
+
+      <div id="formContactoProveedor" style="display:none; margin-top: 14px;">
+        <textarea id="mensajeProveedor" placeholder="Escribe tu pregunta para el proveedor..." rows="3" style="width:100%; max-width:400px; padding:8px; box-sizing:border-box;"></textarea>
+        <br>
+        <button onclick="enviarMensajeProveedor()">Enviar mensaje</button>
+      </div>
     </div>
   `;
 
   if (esAdminActual) {
     mostrarPanelEdicionRapida(producto);
+  }
+}
+
+// Mostrar/ocultar el formulario de contacto al proveedor
+function mostrarFormularioContactoProveedor() {
+  const form = document.getElementById("formContactoProveedor");
+  form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+async function enviarMensajeProveedor() {
+  const { data: sesion } = await supabaseClient.auth.getSession();
+  if (!sesion.session) {
+    alert("Debes iniciar sesión para contactar a un proveedor.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const mensaje = document.getElementById("mensajeProveedor").value.trim();
+  if (!mensaje) {
+    alert("Escribe un mensaje antes de enviarlo.");
+    return;
+  }
+
+  // Traemos nombre y correo del perfil, ya que mensajes_soporte los requiere
+  const { data: perfil } = await supabaseClient
+    .from("perfiles")
+    .select("nombre, apellido_paterno")
+    .eq("id", sesion.session.user.id)
+    .single();
+
+  const { error } = await supabaseClient
+    .from("mensajes_soporte")
+    .insert({
+      usuario_id: sesion.session.user.id,
+      nombre: perfil ? `${perfil.nombre} ${perfil.apellido_paterno || ""}`.trim() : "Usuario",
+      correo: sesion.session.user.email,
+      tipo: "proveedor",
+      proveedor_id: proveedorActualId,
+      producto_id: productoActualId,
+      mensaje: mensaje
+    });
+
+  if (error) {
+    alert("Error al enviar mensaje: " + error.message);
+  } else {
+    alert("¡Mensaje enviado! El equipo de PoliMarket lo hará llegar al proveedor.");
+    document.getElementById("mensajeProveedor").value = "";
+    document.getElementById("formContactoProveedor").style.display = "none";
   }
 }
 

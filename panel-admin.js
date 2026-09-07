@@ -439,6 +439,154 @@ async function actualizarEstadoPedido(pedidoId, nuevoEstado) {
   // No hace falta recargar toda la lista; el <select> ya refleja el cambio.
 }
 
+// ============================================
+// MENSAJES (vista admin)
+// ============================================
+
+async function cargarMensajesAdmin() {
+  const { data: soporte, error: errorSoporte } = await supabaseClient
+    .from("mensajes_soporte")
+    .select("id, nombre, correo, mensaje, atendido, creado_en")
+    .order("creado_en", { ascending: false });
+
+  if (errorSoporte) console.error("Error al cargar mensajes de soporte:", errorSoporte.message);
+  renderizarMensajesSoporte(soporte || []);
+
+  const { data: proveedor, error: errorProveedor } = await supabaseClient
+    .from("mensajes_proveedor")
+    .select(`
+      id, mensaje, atendido, creado_en,
+      proveedores ( nombre ),
+      productos ( nombre ),
+      perfiles ( nombre, apellido_paterno )
+    `)
+    .order("creado_en", { ascending: false });
+
+  if (errorProveedor) console.error("Error al cargar mensajes a proveedores:", errorProveedor.message);
+  renderizarMensajesProveedor(proveedor || []);
+}
+
+function renderizarMensajesSoporte(lista) {
+  const contenedor = document.getElementById("listaMensajesSoporte");
+  contenedor.innerHTML = lista.length === 0 ? "<p>No hay mensajes de soporte.</p>" : "";
+
+  lista.forEach((m) => {
+    const fila = document.createElement("div");
+    fila.className = "tarjeta-pedido-admin";
+    fila.innerHTML = `
+      <p><strong>${m.nombre}</strong> (${m.correo})</p>
+      <p>${m.mensaje}</p>
+      <label>
+        <input type="checkbox" ${m.atendido ? "checked" : ""}
+          onchange="marcarAtendido('mensajes_soporte', ${m.id}, this.checked)">
+        Atendido
+      </label>
+    `;
+    contenedor.appendChild(fila);
+  });
+}
+
+function renderizarMensajesProveedor(lista) {
+  const contenedor = document.getElementById("listaMensajesProveedor");
+  contenedor.innerHTML = lista.length === 0 ? "<p>No hay mensajes para proveedores.</p>" : "";
+
+  lista.forEach((m) => {
+    const nombreCliente = m.perfiles ? `${m.perfiles.nombre} ${m.perfiles.apellido_paterno || ""}` : "Cliente";
+
+    const fila = document.createElement("div");
+    fila.className = "tarjeta-pedido-admin";
+    fila.innerHTML = `
+      <p><strong>Para:</strong> ${m.proveedores?.nombre || "Proveedor"} — <strong>Producto:</strong> ${m.productos?.nombre || "N/A"}</p>
+      <p><strong>De:</strong> ${nombreCliente}</p>
+      <p>${m.mensaje}</p>
+      <label>
+        <input type="checkbox" ${m.atendido ? "checked" : ""}
+          onchange="marcarAtendido('mensajes_proveedor', ${m.id}, this.checked)">
+        Atendido
+      </label>
+    `;
+    contenedor.appendChild(fila);
+  });
+}
+
+async function marcarAtendido(tabla, id, valor) {
+  const { error } = await supabaseClient.from(tabla).update({ atendido: valor }).eq("id", id);
+  if (error) alert("Error al actualizar: " + error.message);
+}
+
+// ============================================
+// MENSAJES (vista admin)
+// ============================================
+
+async function cargarMensajesAdmin() {
+  const { data, error } = await supabaseClient
+    .from("mensajes_soporte")
+    .select(`
+      id, nombre, correo, tipo, mensaje, estado, creado_en,
+      proveedores ( nombre ),
+      productos ( nombre )
+    `)
+    .order("creado_en", { ascending: false });
+
+  if (error) {
+    console.error("Error al cargar mensajes:", error.message);
+    return;
+  }
+
+  const generales = data.filter((m) => m.tipo === "general");
+  const deProveedor = data.filter((m) => m.tipo === "proveedor");
+
+  renderizarMensajes("listaMensajesSoporte", generales);
+  renderizarMensajes("listaMensajesProveedor", deProveedor);
+}
+
+function renderizarMensajes(idContenedor, mensajes) {
+  const contenedor = document.getElementById(idContenedor);
+  contenedor.innerHTML = "";
+
+  if (mensajes.length === 0) {
+    contenedor.innerHTML = "<p>No hay mensajes aquí.</p>";
+    return;
+  }
+
+  mensajes.forEach((m) => {
+    const fecha = new Date(m.creado_en).toLocaleDateString("es-MX", {
+      year: "numeric", month: "long", day: "numeric"
+    });
+
+    const contextoExtra = m.tipo === "proveedor"
+      ? `<p>Proveedor: ${m.proveedores?.nombre || "?"} — Producto: ${m.productos?.nombre || "?"}</p>`
+      : "";
+
+    const tarjeta = document.createElement("div");
+    tarjeta.className = "tarjeta-pedido-admin";
+    tarjeta.innerHTML = `
+      <p><strong>${m.nombre}</strong> (${m.correo}) — ${fecha}
+        <span style="margin-left:8px; padding:2px 8px; border-radius:10px; background:${m.estado === "nuevo" ? "#fff3cd" : "#d1e7dd"};">
+          ${m.estado}
+        </span>
+      </p>
+      ${contextoExtra}
+      <p>"${m.mensaje}"</p>
+      ${m.estado === "nuevo" ? `<button onclick="marcarMensajeAtendido(${m.id})">Marcar como atendido</button>` : ""}
+    `;
+    contenedor.appendChild(tarjeta);
+  });
+}
+
+async function marcarMensajeAtendido(id) {
+  const { error } = await supabaseClient
+    .from("mensajes_soporte")
+    .update({ estado: "atendido" })
+    .eq("id", id);
+
+  if (error) {
+    alert("Error al actualizar: " + error.message);
+  } else {
+    cargarMensajesAdmin();
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const esAdmin = await verificarEsAdmin();
   if (!esAdmin) return;
@@ -447,4 +595,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   cargarProveedoresAdmin();
   cargarProductosAdmin();
   cargarPedidosAdmin();
+  cargarMensajesAdmin();
 });
