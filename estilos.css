@@ -1,0 +1,132 @@
+/* ============================================
+   POLIMARKET - Hoja de estilos compartida
+   Dirección visual: "Tianguis digital"
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+:root {
+  --color-acento: #D85A30;       /* terracota - color principal */
+  --color-acento-oscuro: #993C1D;
+  --color-acento-suave: #FAECE7; /* fondo cálido para tarjetas */
+  --color-texto: #4A1B0C;        /* café oscuro para títulos */
+  --color-texto-suave: #7A5A4E;  /* café más claro para texto secundario */
+  --color-borde: #F0997B;
+  --color-fondo: #FFFDFB;
+  --color-exito: #d1e7dd;
+  --color-pendiente: #fdebd3;
+  --color-peligro: #f8d7da;
+  --radio-pastilla: 999px;
+  --radio-tarjeta: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  color: var(--color-texto);
+  background: var(--color-fondo);
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-weight: 500;
+  color: var(--color-texto);
+}
+
+a {
+  color: var(--color-acento-oscuro);
+}
+
+nav {
+  padding: 14px 24px;
+  border-bottom: 2px solid var(--color-acento);
+  background: var(--color-fondo);
+}
+nav a {
+  margin-right: 18px;
+  text-decoration: none;
+  color: var(--color-texto);
+  font-weight: 500;
+}
+nav a:hover { color: var(--color-acento); }
+
+/* Botones tipo pastilla, el sello visual de esta dirección */
+button {
+  font-family: 'Poppins', Arial, sans-serif;
+  background: var(--color-acento);
+  color: #fff;
+  border: none;
+  border-radius: var(--radio-pastilla);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+button:hover { background: var(--color-acento-oscuro); }
+
+/* Botón secundario (cancelar, limpiar, etc.) */
+button.secundario, button.opcion-drawer {
+  background: transparent;
+  color: var(--color-texto);
+  border: 2px solid var(--color-borde);
+}
+button.secundario:hover { background: var(--color-acento-suave); }
+
+input, textarea, select {
+  font-family: 'Poppins', Arial, sans-serif;
+  border: 2px solid var(--color-borde);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--color-acento);
+}
+
+/* Tarjetas: productos, pedidos, reseñas, filas de carrito/favoritos */
+.tarjeta-producto,
+.tarjeta-destacado,
+.tarjeta-pedido,
+.tarjeta-pedido-admin,
+.fila-carrito,
+.fila-favorito,
+.resena,
+#formularioProducto,
+#panelEdicionAdmin {
+  background: #fff;
+  border: 2px solid var(--color-acento-suave);
+  border-radius: var(--radio-tarjeta);
+}
+
+.categorias-texto, .precio { color: var(--color-acento-oscuro); }
+
+/* Pastillas de categoría (index) */
+.pill-categoria {
+  border: 2px solid var(--color-borde) !important;
+  color: var(--color-texto) !important;
+}
+.pill-categoria:hover { background: var(--color-acento-suave); }
+
+/* Estados de pedido */
+.estado-pendiente { background: var(--color-pendiente) !important; }
+.estado-enviado { background: #d6e8fb !important; }
+.estado-entregado { background: var(--color-exito) !important; }
+.estado-cancelado { background: var(--color-peligro) !important; }
+
+/* Logo */
+#logo { color: var(--color-texto) !important; }
+
+/* Círculo de perfil */
+.circulo-perfil {
+  background: var(--color-acento-suave) !important;
+  border-color: var(--color-borde) !important;
+  color: var(--color-acento-oscuro) !important;
+}
+
+/* Sidebar del panel de admin: mantiene su propio esquema oscuro a propósito,
+   para diferenciarse visualmente del sitio de cliente */
+#sidebarAdmin { background: #2C2C2A; }
+#sidebarAdmin button.item-sidebar.activo { border-left-color: var(--color-acento); }
