@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi perfil - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="perfil.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; }
+    nav a { display: block; margin-bottom: 20px; }
+    label { font-size: 13px; color: #555; display: block; margin-bottom: 2px; }
+    input { display: block; width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; }
+    input:disabled { background: #f2f2f2; }
+    button { padding: 10px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <nav><a href="index.html">← Volver al inicio</a></nav>
+
+  <h2>Mi perfil</h2>
+
+  <label for="perfilCorreo">Correo</label>
+  <input type="email" id="perfilCorreo" disabled>
+
+  <label for="perfilNombre">Nombre</label>
+  <input type="text" id="perfilNombre">
+
+  <label for="perfilApellidoPaterno">Apellido paterno</label>
+  <input type="text" id="perfilApellidoPaterno">
+
+  <label for="perfilApellidoMaterno">Apellido materno (opcional)</label>
+  <input type="text" id="perfilApellidoMaterno">
+
+  <button onclick="guardarPerfil()">Guardar cambios</button>
+</body>
+</html>

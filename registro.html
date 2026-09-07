@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; }
+    input { display: block; width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; }
+    label { font-size: 13px; color: #555; margin-bottom: 2px; display: block; }
+    button { padding: 10px 16px; cursor: pointer; }
+    #mensaje { margin-top: 12px; color: red; }
+  </style>
+</head>
+<body>
+  <h2>Crear cuenta</h2>
+
+  <label for="nombre">Nombre</label>
+  <input type="text" id="nombre" placeholder="Nombre" autocomplete="off">
+
+  <label for="apellidoPaterno">Apellido paterno</label>
+  <input type="text" id="apellidoPaterno" placeholder="Apellido paterno" autocomplete="off">
+
+  <label for="apellidoMaterno">Apellido materno (opcional)</label>
+  <input type="text" id="apellidoMaterno" placeholder="Apellido materno (opcional)" autocomplete="off">
+
+  <label for="correo">Correo</label>
+  <input type="email" id="correo" placeholder="Correo">
+
+  <label for="contrasena">Contraseña</label>
+  <input type="password" id="contrasena" placeholder="Contraseña">
+
+  <button id="btnRegistrar">Registrarme</button>
+
+  <p id="mensaje"></p>
+
+  <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+
+  <script>
+    document.getElementById("btnRegistrar").addEventListener("click", async () => {
+      const nombre = document.getElementById("nombre").value.trim();
+      const apellidoPaterno = document.getElementById("apellidoPaterno").value.trim();
+      const apellidoMaterno = document.getElementById("apellidoMaterno").value.trim();
+      const correo = document.getElementById("correo").value;
+      const contrasena = document.getElementById("contrasena").value;
+      const mensaje = document.getElementById("mensaje");
+
+      if (!nombre || !apellidoPaterno) {
+        mensaje.style.color = "red";
+        mensaje.textContent = "Nombre y apellido paterno son obligatorios.";
+        return;
+      }
+
+      const resultado = await registrarUsuario(correo, contrasena, nombre, apellidoPaterno, apellidoMaterno);
+
+      if (resultado.exito) {
+        mensaje.style.color = "green";
+        mensaje.textContent = "¡Cuenta creada! Redirigiendo...";
+        window.location.href = "index.html";
+      } else {
+        mensaje.style.color = "red";
+        mensaje.textContent = "Error: " + resultado.mensaje;
+      }
+    });
+  </script>
+</body>
+</html>

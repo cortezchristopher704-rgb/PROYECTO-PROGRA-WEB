@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Catálogo - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="catalogo.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 30px auto; }
+    nav a { margin-right: 16px; }
+    #barraFiltros { display: flex; gap: 10px; margin-bottom: 20px; }
+    #buscador, #filtroCategoria { padding: 8px; }
+    #contenedorProductos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .tarjeta-producto {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .tarjeta-producto img { max-width: 100%; height: 150px; object-fit: cover; }
+    .categorias-texto { font-size: 12px; color: gray; }
+    button { margin: 4px 2px; padding: 6px 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html">Catálogo</a>
+    <a href="carrito.html">Mi carrito</a>
+    <a href="favoritos.html">Mis favoritos</a>
+    <a href="mis-pedidos.html">Mis pedidos</a>
+  </nav>
+
+  <h2>Catálogo de productos</h2>
+
+  <div id="barraFiltros">
+    <input type="text" id="buscador" placeholder="Buscar producto..." oninput="filtrarProductos()">
+
+    <select id="filtroCategoria" onchange="filtrarProductos()">
+      <option value="todas">Todas las categorías</option>
+      <!-- Las opciones de categoría se agregan automáticamente desde catalogo.js -->
+    </select>
+  </div>
+
+  <div id="contenedorProductos">
+    <!-- Aquí se pintan las tarjetas de producto automáticamente -->
+  </div>
+</body>
+</html>

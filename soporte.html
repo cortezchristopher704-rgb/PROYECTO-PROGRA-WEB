@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Contacto a soporte - PoliMarket</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; }
+    nav a { display: block; margin-bottom: 20px; }
+    input, textarea { display: block; width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; }
+    button { padding: 10px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <nav><a href="index.html">← Volver al inicio</a></nav>
+
+  <h2>Contacto a soporte</h2>
+  <p>¿Tienes dudas o un problema con tu pedido? Escríbenos.</p>
+
+  <input type="text" id="soporteNombre" placeholder="Tu nombre">
+  <input type="email" id="soporteCorreo" placeholder="Tu correo">
+  <textarea id="soporteMensaje" placeholder="Cuéntanos qué pasó..." rows="5"></textarea>
+
+  <button onclick="alert('¡Gracias! Esta sección todavía es un borrador — falta conectarla a una tabla real en Supabase para guardar los mensajes.')">
+    Enviar mensaje
+  </button>
+</body>
+</html>

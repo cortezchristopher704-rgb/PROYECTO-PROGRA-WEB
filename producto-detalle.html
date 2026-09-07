@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalle de producto - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="producto-detalle.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; }
+    nav a { margin-right: 16px; }
+
+    #contenidoProducto {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    #imagenProducto { width: 280px; height: 280px; object-fit: cover; border-radius: 8px; }
+    .precio { font-size: 24px; font-weight: bold; }
+
+    section { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 16px; }
+    #calificacionPromedio { font-size: 18px; margin-bottom: 12px; }
+    .resena { border-bottom: 1px solid #eee; padding: 10px 0; }
+
+    #formResena select, #formResena textarea {
+      display: block;
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+    }
+    button { padding: 8px 14px; cursor: pointer; margin-right: 6px; }
+    #panelEdicionAdmin label { display: block; margin-bottom: 8px; }
+    #panelEdicionAdmin input { padding: 6px; margin-left: 6px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html">Catálogo</a>
+  </nav>
+
+  <div id="contenidoProducto">
+    <!-- Se llena automáticamente desde producto-detalle.js -->
+  </div>
+
+  <div id="panelEdicionAdmin" style="display:none; border: 2px dashed #999; padding: 14px; margin-top: 16px; border-radius: 8px;">
+    <!-- Solo se llena y se muestra si quien ve la página es admin -->
+  </div>
+
+  <section>
+    <h2>Reseñas</h2>
+    <p id="calificacionPromedio"></p>
+
+    <div id="formResena">
+      <label for="inputCalificacion">Tu calificación:</label>
+      <select id="inputCalificacion">
+        <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+        <option value="4">⭐⭐⭐⭐ (4)</option>
+        <option value="3">⭐⭐⭐ (3)</option>
+        <option value="2">⭐⭐ (2)</option>
+        <option value="1">⭐ (1)</option>
+      </select>
+      <textarea id="inputComentario" placeholder="Escribe tu comentario (opcional)"></textarea>
+      <button onclick="enviarResena()">Enviar reseña</button>
+    </div>
+
+    <div id="listaResenas">
+      <!-- Se llena automáticamente desde producto-detalle.js -->
+    </div>
+  </section>
+</body>
+</html>

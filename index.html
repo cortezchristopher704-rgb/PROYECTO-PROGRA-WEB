@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PoliMarket - Inicio</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="index.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #buscadorHeader { display: flex; justify-content: center; align-items: center; }
+    #buscadorHeader input { padding: 8px; width: 320px; }
+    #buscadorHeader button { padding: 8px 12px; margin-left: 4px; cursor: pointer; }
+
+    #logo {
+      font-size: 26px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #222;
+      justify-self: start;
+    }
+
+    #accionesHeader { display: flex; align-items: center; gap: 24px; justify-self: end; }
+    #accionesHeader a { text-decoration: none; color: #222; }
+    #zonaSesion { display: flex; align-items: center; gap: 24px; }
+
+    .circulo-perfil {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #222;
+      font-size: 16px;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 998;
+    }
+    .drawer-overlay.visible { display: block; }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 280px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.15);
+      transition: left 0.25s ease;
+      z-index: 999;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .drawer.abierto { left: 0; }
+
+    .drawer-cerrar {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      float: right;
+    }
+    .drawer h3 { margin-top: 30px; }
+    .drawer a, .drawer button.opcion-drawer {
+      display: block;
+      padding: 12px 0;
+      text-decoration: none;
+      color: #222;
+      border-bottom: 1px solid #eee;
+      background: none;
+      border-left: none; border-right: none; border-top: none;
+      width: 100%;
+      text-align: left;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .banner {
+      background: #f4f4f4;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .banner h1 { margin: 0 0 10px; }
+    .banner button {
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    section { padding: 30px 24px; }
+
+    #listaCategorias { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill-categoria {
+      padding: 8px 16px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      text-decoration: none;
+      color: #222;
+    }
+
+    #destacados {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .tarjeta-destacado {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .tarjeta-destacado img { max-width: 100%; height: 130px; object-fit: cover; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="index.html" id="logo">🛒 PoliMarket</a>
+      <button id="iconoPerfil" class="circulo-perfil" onclick="abrirDrawer()">👤</button>
+    </div>
+
+    <div id="buscadorHeader">
+      <input type="text" id="inputBuscador" placeholder="Buscar en PoliMarket...">
+      <button onclick="buscarDesdeInicio()">Buscar</button>
+    </div>
+
+    <div id="accionesHeader">
+      <a href="carrito.html">🛒 Carrito</a>
+      <a href="favoritos.html">❤ Favoritos</a>
+      <a href="mis-pedidos.html">📦 Mis pedidos</a>
+    </div>
+  </header>
+
+  <div class="drawer-overlay" id="drawerOverlay" onclick="cerrarDrawer()"></div>
+  <div class="drawer" id="drawerCuenta">
+    <button class="drawer-cerrar" onclick="cerrarDrawer()">✕</button>
+    <h3>Mi cuenta</h3>
+    <div id="contenidoDrawer">
+      <!-- Se llena automáticamente desde index.js, según si hay sesión o no -->
+    </div>
+  </div>
+
+  <div class="banner">
+    <h1>Encuentra de todo en PoliMarket</h1>
+    <p>Compra y vende fácil, rápido y seguro.</p>
+    <button onclick="window.location.href='catalogo.html'">Ver catálogo completo</button>
+  </div>
+
+  <section>
+    <h2>Categorías</h2>
+    <div id="listaCategorias">
+      <!-- Se llena automáticamente desde index.js -->
+    </div>
+  </section>
+
+  <section>
+    <h2>Productos destacados</h2>
+    <div id="destacados">
+      <!-- Se llena automáticamente desde index.js -->
+    </div>
+  </section>
+
+</body>
+</html>

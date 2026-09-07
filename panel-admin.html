@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de administrador - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="panel-admin.js" defer></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; margin: 0; display: flex; min-height: 100vh; }
+
+    #sidebarAdmin {
+      width: 220px;
+      background: #1f2937;
+      color: #fff;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    #sidebarAdmin h2 { padding: 0 20px; font-size: 18px; margin-bottom: 20px; }
+    #sidebarAdmin a, #sidebarAdmin button.item-sidebar {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: #d1d5db;
+      text-decoration: none;
+      padding: 12px 20px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    #sidebarAdmin a:hover, #sidebarAdmin button.item-sidebar:hover { background: #374151; color: #fff; }
+    #sidebarAdmin button.item-sidebar.activo { background: #374151; color: #fff; border-left: 4px solid #60a5fa; }
+    #sidebarAdmin hr { border-color: #374151; margin: 12px 20px; }
+
+    main { flex: 1; padding: 30px; max-width: 900px; }
+
+    .panel-seccion { display: none; }
+    .panel-seccion.visible { display: block; }
+
+    section.tarjeta { margin-top: 10px; }
+    input, textarea { display: block; margin-bottom: 10px; padding: 8px; width: 100%; max-width: 400px; box-sizing: border-box; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .fila-categoria { display: flex; justify-content: space-between; max-width: 300px; padding: 6px 0; border-bottom: 1px solid #eee; }
+    #checkboxesCategorias { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+    button { padding: 8px 14px; cursor: pointer; margin-right: 6px; }
+
+    .tarjeta-pedido-admin {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .tarjeta-pedido-admin select { display: inline-block; width: auto; }
+  </style>
+</head>
+<body>
+
+  <nav id="sidebarAdmin">
+    <h2>🛠️ Panel Admin</h2>
+    <button class="item-sidebar activo" onclick="mostrarSeccion('seccionProductos', this)">📦 Productos</button>
+    <button class="item-sidebar" onclick="mostrarSeccion('seccionCategorias', this)">🏷️ Categorías</button>
+    <button class="item-sidebar" onclick="mostrarSeccion('seccionProveedores', this)">🚚 Proveedores</button>
+    <button class="item-sidebar" onclick="mostrarSeccion('seccionPedidos', this)">📋 Pedidos</button>
+    <hr>
+    <a href="index.html">← Volver al inicio</a>
+    <a href="catalogo.html">Ver catálogo</a>
+  </nav>
+
+  <main>
+    <div id="seccionProductos" class="panel-seccion visible">
+      <h1>Productos</h1>
+
+      <section class="tarjeta" id="formularioProducto">
+        <h2 id="formTitulo">Agregar producto nuevo</h2>
+
+        <input type="text" id="productoNombre" placeholder="Nombre del producto">
+        <textarea id="productoDescripcion" placeholder="Descripción"></textarea>
+        <input type="number" id="productoPrecio" placeholder="Precio" step="0.01">
+        <input type="number" id="productoStock" placeholder="Stock disponible">
+        <input type="text" id="productoImagen" placeholder="URL de la imagen">
+
+        <label for="productoProveedor">Proveedor: <span style="color:red">*obligatorio</span></label>
+        <select id="productoProveedor">
+          <option value="" disabled selected>Selecciona un proveedor</option>
+        </select>
+
+        <p>Categorías:</p>
+        <div id="checkboxesCategorias"></div>
+
+        <button id="btnGuardarProducto" onclick="guardarProducto()">Agregar producto</button>
+        <button onclick="limpiarFormularioProducto()">Cancelar / Limpiar</button>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Productos existentes</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Categorías</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTablaProductos"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <div id="seccionCategorias" class="panel-seccion">
+      <h1>Categorías</h1>
+      <div id="listaCategoriasAdmin"></div>
+
+      <input type="text" id="nuevaCategoria" placeholder="Nombre de categoría nueva">
+      <button onclick="agregarCategoria()">Agregar categoría</button>
+    </div>
+
+    <div id="seccionProveedores" class="panel-seccion">
+      <h1>Proveedores</h1>
+      <div id="listaProveedoresAdmin"></div>
+
+      <input type="text" id="nuevoProveedorNombre" placeholder="Nombre del proveedor">
+      <input type="text" id="nuevoProveedorContacto" placeholder="Contacto (correo o teléfono)">
+      <button onclick="agregarProveedor()">Agregar proveedor</button>
+    </div>
+
+    <div id="seccionPedidos" class="panel-seccion">
+      <h1>Pedidos</h1>
+      <div id="listaPedidosAdmin"></div>
+    </div>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Recuperar contraseña - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; }
+    input { display: block; width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; }
+    button { padding: 10px 16px; cursor: pointer; }
+    #mensaje { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h2>Recuperar contraseña</h2>
+  <p>Escribe tu correo y te mandaremos un link para poner una contraseña nueva.</p>
+
+  <input type="email" id="correo" placeholder="Tu correo">
+  <button id="btnEnviar">Enviar link de recuperación</button>
+
+  <p id="mensaje"></p>
+
+  <p><a href="login.html">Volver a iniciar sesión</a></p>
+
+  <script>
+    document.getElementById("btnEnviar").addEventListener("click", async () => {
+      const correo = document.getElementById("correo").value;
+      const mensaje = document.getElementById("mensaje");
+
+      const resultado = await solicitarRecuperacion(correo);
+
+      if (resultado.exito) {
+        mensaje.style.color = "green";
+        mensaje.textContent = "Listo, revisa tu correo para el link de recuperación.";
+      } else {
+        mensaje.style.color = "red";
+        mensaje.textContent = "Error: " + resultado.mensaje;
+      }
+    });
+  </script>
+</body>
+</html>

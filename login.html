@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar sesión - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; }
+    input { display: block; width: 100%; margin-bottom: 12px; padding: 8px; }
+    button { padding: 10px 16px; cursor: pointer; }
+    #mensaje { margin-top: 12px; color: red; }
+  </style>
+</head>
+<body>
+  <h2>Iniciar sesión</h2>
+
+  <input type="email" id="correo" placeholder="Correo">
+  <input type="password" id="contrasena" placeholder="Contraseña">
+
+  <button id="btnLogin">Entrar</button>
+
+  <p id="mensaje"></p>
+
+  <p><a href="recuperar.html">¿Olvidaste tu contraseña?</a></p>
+
+  <p>¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a></p>
+
+  <script>
+    document.getElementById("btnLogin").addEventListener("click", async () => {
+      const correo = document.getElementById("correo").value;
+      const contrasena = document.getElementById("contrasena").value;
+      const mensaje = document.getElementById("mensaje");
+
+      const resultado = await iniciarSesion(correo, contrasena);
+
+      if (!resultado.exito) {
+        mensaje.style.color = "red";
+        mensaje.textContent = "Error: " + resultado.mensaje;
+        return;
+      }
+
+      mensaje.style.color = "green";
+      mensaje.textContent = "¡Bienvenido! Redirigiendo...";
+
+      // Mandamos a todos al inicio por ahora. Cuando exista panel-admin.html,
+      // aquí mismo podemos mandar a los admins directo a su panel:
+      // if (resultado.rol === "admin") { window.location.href = "panel-admin.html"; return; }
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

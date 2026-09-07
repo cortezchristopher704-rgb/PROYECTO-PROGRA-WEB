@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Nueva contraseña - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 60px auto; }
+    input { display: block; width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; }
+    button { padding: 10px 16px; cursor: pointer; }
+    #mensaje { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h2>Elige tu nueva contraseña</h2>
+
+  <input type="password" id="nuevaContrasena" placeholder="Nueva contraseña">
+  <button id="btnActualizar">Guardar nueva contraseña</button>
+
+  <p id="mensaje"></p>
+
+  <script>
+    document.getElementById("btnActualizar").addEventListener("click", async () => {
+      const nuevaContrasena = document.getElementById("nuevaContrasena").value;
+      const mensaje = document.getElementById("mensaje");
+
+      if (nuevaContrasena.length < 6) {
+        mensaje.style.color = "red";
+        mensaje.textContent = "La contraseña debe tener al menos 6 caracteres.";
+        return;
+      }
+
+      const resultado = await actualizarContrasena(nuevaContrasena);
+
+      if (resultado.exito) {
+        mensaje.style.color = "green";
+        mensaje.textContent = "¡Contraseña actualizada! Ya puedes iniciar sesión.";
+        setTimeout(() => window.location.href = "login.html", 2000);
+      } else {
+        mensaje.style.color = "red";
+        mensaje.textContent = "Error: " + resultado.mensaje;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis pedidos - PoliMarket</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="mis-pedidos.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; }
+    nav a { margin-right: 16px; }
+
+    .tarjeta-pedido {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .encabezado-pedido {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .estado {
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      background: #eee;
+    }
+    .estado-pendiente { background: #fff3cd; }
+    .estado-enviado { background: #cfe2ff; }
+    .estado-entregado { background: #d1e7dd; }
+    .estado-cancelado { background: #f8d7da; }
+
+    .linea-pedido {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+    }
+    .linea-pedido img { width: 40px; height: 40px; object-fit: cover; }
+    .total-pedido { text-align: right; font-weight: bold; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="catalogo.html">Catálogo</a>
+    <a href="carrito.html">Mi carrito</a>
+    <a href="favoritos.html">Mis favoritos</a>
+    <a href="mis-pedidos.html">Mis pedidos</a>
+  </nav>
+
+  <h2>Mis pedidos</h2>
+
+  <div id="contenedorPedidos">
+    <!-- Se llena automáticamente desde mis-pedidos.js -->
+  </div>
+</body>
+</html>
