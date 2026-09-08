@@ -208,7 +208,7 @@ async function cargarProductosAdmin() {
   const { data, error } = await supabaseClient
     .from("productos")
     .select(`
-      id, nombre, descripcion, precio, stock, imagen_url, proveedor_id,
+      id, nombre, descripcion, precio, stock, imagen_url, proveedor_id, activo,
       producto_categorias ( categoria_id, categorias ( nombre ) )
     `)
     .order("id");
@@ -236,13 +236,30 @@ function renderizarTablaProductos(lista) {
       <td>$${producto.precio}</td>
       <td>${producto.stock}</td>
       <td>${nombresCategorias}</td>
+      <td>${producto.activo ? "✅ Activo" : "🚫 Deshabilitado"}</td>
       <td>
         <button onclick='cargarProductoParaEditar(${JSON.stringify(producto)})'>Editar</button>
+        <button class="secundario" onclick="alternarActivoProductoAdmin(${producto.id}, ${producto.activo})">
+          ${producto.activo ? "Deshabilitar" : "Reactivar"}
+        </button>
         <button onclick="eliminarProducto(${producto.id})">Borrar</button>
       </td>
     `;
     cuerpo.appendChild(fila);
   });
+}
+
+async function alternarActivoProductoAdmin(id, estaActivo) {
+  const { error } = await supabaseClient
+    .from("productos")
+    .update({ activo: !estaActivo })
+    .eq("id", id);
+
+  if (error) {
+    alert("Error al actualizar: " + error.message);
+  } else {
+    cargarProductosAdmin();
+  }
 }
 
 function cargarProductoParaEditar(producto) {
@@ -261,6 +278,10 @@ function cargarProductoParaEditar(producto) {
 
   document.getElementById("btnGuardarProducto").textContent = "Guardar cambios";
   window.scrollTo(0, document.getElementById("formularioProducto").offsetTop);
+
+  // Las variantes solo tienen sentido cuando el producto ya existe
+  document.getElementById("seccionVariantes").style.display = "block";
+  cargarVariantesDelProducto(producto.id);
 }
 
 function limpiarFormularioProducto() {
@@ -274,6 +295,82 @@ function limpiarFormularioProducto() {
   renderizarSelectProveedor(null);
   renderizarCheckboxesCategorias([]);
   document.getElementById("btnGuardarProducto").textContent = "Agregar producto";
+  document.getElementById("seccionVariantes").style.display = "none";
+}
+
+// ============================================
+// VARIANTES DE PRODUCTO
+// ============================================
+
+async function cargarVariantesDelProducto(productoId) {
+  const { data, error } = await supabaseClient
+    .from("variantes_producto")
+    .select("id, valor, stock")
+    .eq("producto_id", productoId)
+    .order("id");
+
+  if (error) {
+    console.error("Error al cargar variantes:", error.message);
+    return;
+  }
+
+  const contenedor = document.getElementById("listaVariantes");
+  contenedor.innerHTML = "";
+
+  if (data.length === 0) {
+    contenedor.innerHTML = "<p>Este producto todavía no tiene variantes.</p>";
+    return;
+  }
+
+  data.forEach((variante) => {
+    const fila = document.createElement("div");
+    fila.className = "fila-categoria";
+    fila.innerHTML = `
+      <span>${variante.valor} — stock: ${variante.stock}</span>
+      <button onclick="eliminarVariante(${variante.id})">Borrar</button>
+    `;
+    contenedor.appendChild(fila);
+  });
+}
+
+async function agregarVariante() {
+  if (!productoEnEdicion) {
+    alert("Primero guarda el producto antes de agregarle variantes.");
+    return;
+  }
+
+  const valor = document.getElementById("nuevaVarianteValor").value.trim();
+  const stock = parseInt(document.getElementById("nuevaVarianteStock").value);
+
+  if (!valor || isNaN(stock)) {
+    alert("Escribe el valor de la variante (ej. 'Rojo') y su stock.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("variantes_producto")
+    .insert({ producto_id: productoEnEdicion, nombre: "Color", valor, stock });
+
+  if (error) {
+    alert("Error al agregar variante: " + error.message);
+  } else {
+    document.getElementById("nuevaVarianteValor").value = "";
+    document.getElementById("nuevaVarianteStock").value = "";
+    cargarVariantesDelProducto(productoEnEdicion);
+  }
+}
+
+async function eliminarVariante(id) {
+  const { error } = await supabaseClient
+    .from("variantes_producto")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("Error al borrar variante: " + error.message);
+  } else {
+    cargarVariantesDelProducto(productoEnEdicion);
+  }
 }
 
 async function guardarProducto() {
@@ -343,8 +440,12 @@ async function guardarProducto() {
     await supabaseClient.from("producto_categorias").insert(filasCategorias);
   }
 
-  alert("¡Producto guardado con éxito!");
-  limpiarFormularioProducto();
+  alert("¡Producto guardado con éxito! Ahora puedes agregarle variantes si quiere.");
+  productoEnEdicion = productoId;
+  document.getElementById("formTitulo").textContent = "Editar producto";
+  document.getElementById("btnGuardarProducto").textContent = "Guardar cambios";
+  document.getElementById("seccionVariantes").style.display = "block";
+  cargarVariantesDelProducto(productoId);
   cargarProductosAdmin();
 }
 

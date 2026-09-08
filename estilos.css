@@ -129,4 +129,5 @@ input:focus, textarea:focus, select:focus {
 /* Sidebar del panel de admin: mantiene su propio esquema oscuro a propósito,
    para diferenciarse visualmente del sitio de cliente */
 #sidebarAdmin { background: #2C2C2A; }
+#sidebarAdmin h2 { color: #fff; }
 #sidebarAdmin button.item-sidebar.activo { border-left-color: var(--color-acento); }

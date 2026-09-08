@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PoliMarket - Inicio</title>
   <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -132,6 +133,20 @@
       text-align: center;
     }
     .tarjeta-destacado img { max-width: 100%; height: 130px; object-fit: cover; }
+    @media (max-width: 640px) {
+      header {
+        grid-template-columns: 1fr;
+        row-gap: 12px;
+        justify-items: center;
+      }
+      #buscadorHeader input { width: 100%; max-width: 280px; }
+      #accionesHeader { gap: 14px; flex-wrap: wrap; justify-content: center; }
+      #accionesHeader a { font-size: 14px; }
+      .banner { padding: 40px 16px; }
+      .banner h1 { font-size: 24px; }
+      #destacados { grid-template-columns: repeat(2, 1fr); }
+      .drawer { width: min(280px, 85vw); }
+    }
   </style>
 </head>
 <body>

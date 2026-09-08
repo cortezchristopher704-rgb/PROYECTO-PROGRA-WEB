@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mis favoritos - PoliMarket</title>
   <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,6 +19,10 @@
     }
     .fila-favorito img { width: 60px; height: 60px; object-fit: cover; }
     nav a { margin-right: 16px; }
+    @media (max-width: 640px) {
+      .fila-favorito { flex-wrap: wrap; }
+      nav a { display: inline-block; margin-bottom: 6px; }
+    }
   </style>
 </head>
 <body>

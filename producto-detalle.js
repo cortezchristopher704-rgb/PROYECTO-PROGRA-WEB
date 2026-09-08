@@ -38,7 +38,7 @@ async function cargarProducto() {
   const { data, error } = await supabaseClient
     .from("productos")
     .select(`
-      id, nombre, descripcion, precio, stock, imagen_url, proveedor_id,
+      id, nombre, descripcion, precio, stock, imagen_url, proveedor_id, activo,
       proveedores ( nombre, contacto ),
       producto_categorias ( categorias ( nombre ) )
     `)
@@ -52,6 +52,28 @@ async function cargarProducto() {
   }
 
   renderizarProducto(data);
+  cargarVariantesDetalle();
+}
+
+async function cargarVariantesDetalle() {
+  const { data, error } = await supabaseClient
+    .from("variantes_producto")
+    .select("valor, stock")
+    .eq("producto_id", productoActualId);
+
+  if (error || !data || data.length === 0) return;
+
+  const opciones = data.map(v => `<option ${v.stock === 0 ? "disabled" : ""}>${v.valor}${v.stock === 0 ? " (agotado)" : ""}</option>`).join("");
+
+  const contenedor = document.getElementById("contenidoProducto");
+  const selectorHtml = `
+    <label>Opciones disponibles:
+      <select id="selectorVariante">${opciones}</select>
+    </label><br><br>
+  `;
+  // Lo insertamos justo antes de los botones de acción
+  const divInfo = contenedor.querySelector("div");
+  divInfo.insertAdjacentHTML("beforeend", selectorHtml);
 }
 
 let productoCompletoActual = null;
@@ -68,6 +90,10 @@ function renderizarProducto(producto) {
     ? `${producto.proveedores.nombre} (${producto.proveedores.contacto || "sin contacto"})`
     : "No especificado";
 
+  const avisoInactivo = !producto.activo
+    ? `<p style="background:var(--color-peligro); padding:8px 12px; border-radius:8px;">⚠️ Este producto no está disponible actualmente.</p>`
+    : "";
+
   document.getElementById("contenidoProducto").innerHTML = `
     <img src="${producto.imagen_url}" alt="${producto.nombre}" id="imagenProducto">
     <div>
@@ -77,7 +103,8 @@ function renderizarProducto(producto) {
       <p>Stock disponible: <span id="stockMostrado">${producto.stock}</span></p>
       <p>Categorías: ${nombresCategorias}</p>
       <p>Proveedor: ${proveedorTexto}</p>
-      <button onclick="agregarAlCarritoDesdeDetalle()">Agregar al carrito</button>
+      ${avisoInactivo}
+      <button onclick="agregarAlCarritoDesdeDetalle()" ${producto.activo ? "" : "disabled"}>Agregar al carrito</button>
       <button onclick="agregarAFavoritosDesdeDetalle()">❤ Favorito</button>
       <button onclick="mostrarFormularioContactoProveedor()">✉️ Contactar proveedor</button>
 
@@ -151,7 +178,32 @@ function mostrarPanelEdicionRapida(producto) {
     <label>Precio: <input type="number" id="editarPrecio" value="${producto.precio}" step="0.01"></label>
     <label>Stock: <input type="number" id="editarStock" value="${producto.stock}"></label>
     <button onclick="guardarEdicionRapida()">Guardar cambios</button>
+    <button class="secundario" onclick="alternarActivoProducto(${producto.activo})">
+      ${producto.activo ? "🚫 Deshabilitar venta" : "✅ Reactivar producto"}
+    </button>
   `;
+}
+
+async function alternarActivoProducto(estaActivo) {
+  const nuevoEstado = !estaActivo;
+  const confirmacion = nuevoEstado
+    ? "¿Reactivar este producto para que vuelva a salir en el catálogo?"
+    : "¿Deshabilitar temporalmente este producto? Dejará de salir en el catálogo hasta que lo reactives.";
+
+  if (!confirm(confirmacion)) return;
+
+  const { error } = await supabaseClient
+    .from("productos")
+    .update({ activo: nuevoEstado })
+    .eq("id", productoActualId);
+
+  if (error) {
+    alert("Error al actualizar: " + error.message);
+    return;
+  }
+
+  alert(nuevoEstado ? "¡Producto reactivado!" : "Producto deshabilitado.");
+  cargarProducto(); // recargamos todo para reflejar el aviso y el botón actualizado
 }
 
 async function guardarEdicionRapida() {

@@ -56,4 +56,89 @@ async function guardarPerfil() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", cargarPerfil);
+document.addEventListener("DOMContentLoaded", () => {
+  cargarPerfil();
+  cargarMisResenas();
+});
+
+// ============================================
+// MIS RESEÑAS
+// ============================================
+
+async function cargarMisResenas() {
+  const { data: sesion } = await supabaseClient.auth.getSession();
+  if (!sesion.session) return;
+
+  const { data, error } = await supabaseClient
+    .from("resenas")
+    .select(`id, calificacion, comentario, productos ( id, nombre )`)
+    .eq("usuario_id", sesion.session.user.id)
+    .order("id", { ascending: false });
+
+  if (error) {
+    console.error("Error al cargar mis reseñas:", error.message);
+    return;
+  }
+
+  renderizarMisResenas(data);
+}
+
+function renderizarMisResenas(resenas) {
+  const contenedor = document.getElementById("listaMisResenas");
+  contenedor.innerHTML = "";
+
+  if (resenas.length === 0) {
+    contenedor.innerHTML = "<p>Todavía no has dejado ninguna reseña.</p>";
+    return;
+  }
+
+  resenas.forEach((resena) => {
+    const fila = document.createElement("div");
+    fila.className = "resena";
+    fila.innerHTML = `
+      <p><strong>${resena.productos.nombre}</strong></p>
+      <label>Calificación:
+        <select id="calificacion-${resena.id}">
+          ${[5,4,3,2,1].map(n => `<option value="${n}" ${n === resena.calificacion ? "selected" : ""}>${"⭐".repeat(n)} (${n})</option>`).join("")}
+        </select>
+      </label>
+      <textarea id="comentario-${resena.id}" rows="2" style="width:100%; max-width:400px;">${resena.comentario || ""}</textarea>
+      <br>
+      <button onclick="guardarEdicionResena(${resena.id})">Guardar cambios</button>
+      <button class="secundario" onclick="borrarMiResena(${resena.id})">Borrar reseña</button>
+      <a href="producto-detalle.html?id=${resena.productos.id}">Ver producto →</a>
+    `;
+    contenedor.appendChild(fila);
+  });
+}
+
+async function guardarEdicionResena(resenaId) {
+  const calificacion = parseInt(document.getElementById(`calificacion-${resenaId}`).value);
+  const comentario = document.getElementById(`comentario-${resenaId}`).value.trim();
+
+  const { error } = await supabaseClient
+    .from("resenas")
+    .update({ calificacion, comentario })
+    .eq("id", resenaId);
+
+  if (error) {
+    alert("Error al guardar: " + error.message);
+  } else {
+    alert("¡Reseña actualizada!");
+  }
+}
+
+async function borrarMiResena(resenaId) {
+  if (!confirm("¿Seguro que quieres borrar esta reseña?")) return;
+
+  const { error } = await supabaseClient
+    .from("resenas")
+    .delete()
+    .eq("id", resenaId);
+
+  if (error) {
+    alert("Error al borrar: " + error.message);
+  } else {
+    cargarMisResenas();
+  }
+}

@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mi carrito - PoliMarket</title>
   <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,6 +22,11 @@
     #totalCarrito { font-size: 20px; font-weight: bold; margin-top: 16px; }
     #btnFinalizar { margin-top: 12px; padding: 10px 16px; cursor: pointer; }
     nav a { margin-right: 16px; }
+    @media (max-width: 640px) {
+      .fila-carrito { flex-wrap: wrap; }
+      .fila-carrito span { flex: 1 1 auto; }
+      nav a { display: inline-block; margin-bottom: 6px; }
+    }
   </style>
 </head>
 <body>

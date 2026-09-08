@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mi perfil - PoliMarket</title>
   <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,5 +35,11 @@
   <input type="text" id="perfilApellidoMaterno">
 
   <button onclick="guardarPerfil()">Guardar cambios</button>
+
+  <hr style="margin: 30px 0;">
+  <h2>Mis reseñas</h2>
+  <div id="listaMisResenas">
+    <!-- Se llena automáticamente desde perfil.js -->
+  </div>
 </body>
 </html>

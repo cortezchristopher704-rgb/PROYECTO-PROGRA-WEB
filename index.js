@@ -90,6 +90,7 @@ async function cargarDestacados() {
   const { data, error } = await supabaseClient
     .from("productos")
     .select("id, nombre, precio, imagen_url")
+    .eq("activo", true)
     .limit(25);
 
   if (error) {

@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mis pedidos - PoliMarket</title>
   <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -43,6 +44,10 @@
     }
     .linea-pedido img { width: 40px; height: 40px; object-fit: cover; }
     .total-pedido { text-align: right; font-weight: bold; margin-top: 8px; }
+    @media (max-width: 640px) {
+      .encabezado-pedido { flex-wrap: wrap; gap: 6px; }
+      nav a { display: inline-block; margin-bottom: 6px; }
+    }
   </style>
 </head>
 <body>

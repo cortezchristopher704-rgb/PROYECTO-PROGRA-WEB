@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Panel de administrador - PoliMarket</title>
   <link rel="stylesheet" href="estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -55,6 +56,24 @@
       margin-bottom: 14px;
     }
     .tarjeta-pedido-admin select { display: inline-block; width: auto; }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      #sidebarAdmin {
+        width: 100%;
+        padding: 10px 0;
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      #sidebarAdmin h2 { display: none; }
+      #sidebarAdmin a, #sidebarAdmin button.item-sidebar {
+        width: auto;
+        padding: 10px 14px;
+      }
+      #sidebarAdmin hr { display: none; }
+      #sidebarAdmin button.item-sidebar.activo { border-left: none; border-bottom: 3px solid var(--color-acento); }
+      main { padding: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -65,7 +84,6 @@
     <button class="item-sidebar" onclick="mostrarSeccion('seccionCategorias', this)">🏷️ Categorías</button>
     <button class="item-sidebar" onclick="mostrarSeccion('seccionProveedores', this)">🚚 Proveedores</button>
     <button class="item-sidebar" onclick="mostrarSeccion('seccionPedidos', this)">📋 Pedidos</button>
-    <button class="item-sidebar" onclick="mostrarSeccion('seccionMensajes', this)">💬 Mensajes</button>
     <button class="item-sidebar" onclick="mostrarSeccion('seccionMensajes', this)">💬 Mensajes</button>
     <hr>
     <a href="index.html">← Volver al inicio</a>
@@ -95,6 +113,14 @@
 
         <button id="btnGuardarProducto" onclick="guardarProducto()">Agregar producto</button>
         <button onclick="limpiarFormularioProducto()">Cancelar / Limpiar</button>
+
+        <div id="seccionVariantes" style="display:none; margin-top:20px; border-top: 1px dashed var(--color-borde); padding-top:14px;">
+          <h3>Variantes (ej. colores)</h3>
+          <div id="listaVariantes"></div>
+          <input type="text" id="nuevaVarianteValor" placeholder="Ej. Rojo, Azul, Talla M">
+          <input type="number" id="nuevaVarianteStock" placeholder="Stock de esta variante">
+          <button onclick="agregarVariante()">Agregar variante</button>
+        </div>
       </section>
 
       <section class="tarjeta">
@@ -106,6 +132,7 @@
               <th>Precio</th>
               <th>Stock</th>
               <th>Categorías</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>

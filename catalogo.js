@@ -19,7 +19,8 @@ async function cargarProductos() {
         categoria_id,
         categorias ( nombre )
       )
-    `);
+    `)
+    .eq("activo", true);
 
   if (error) {
     console.error("Error al cargar productos:", error.message);
