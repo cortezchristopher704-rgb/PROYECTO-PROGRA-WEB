@@ -1,5 +1,5 @@
 // ============================================
-// MARKETPLACE - Carrito de compras
+// POLIMARKET - Carrito de compras
 // ============================================
 
 let itemsDelCarrito = [];
@@ -15,7 +15,7 @@ async function verificarSesion() {
   return data.session.user.id;
 }
 
-// 2. Traer los productos del carrito del usuario, con su info de producto
+// 2. Traer los productos del carrito del usuario, con su info de producto y variante
 // (no hace falta filtrar por usuario_id a mano: RLS ya solo deja ver lo propio)
 async function cargarCarrito() {
   const { data, error } = await supabaseClient
@@ -23,7 +23,8 @@ async function cargarCarrito() {
     .select(`
       id,
       cantidad,
-      productos ( id, nombre, precio, imagen_url )
+      productos ( id, nombre, precio, imagen_url, stock ),
+      variantes_producto ( id, valor, stock )
     `);
 
   if (error) {
@@ -53,11 +54,13 @@ function renderizarCarrito() {
     const subtotal = item.productos.precio * item.cantidad;
     total += subtotal;
 
+    const varianteTexto = item.variantes_producto ? ` — ${item.variantes_producto.valor}` : "";
+
     const fila = document.createElement("div");
     fila.className = "fila-carrito";
     fila.innerHTML = `
       <img src="${item.productos.imagen_url}" alt="${item.productos.nombre}">
-      <span>${item.productos.nombre}</span>
+      <span>${item.productos.nombre}${varianteTexto}</span>
       <span>$${item.productos.precio}</span>
       <input type="number" min="1" value="${item.cantidad}"
         onchange="actualizarCantidad(${item.id}, this.value)">
@@ -75,6 +78,15 @@ function renderizarCarrito() {
 async function actualizarCantidad(carritoId, nuevaCantidad) {
   const cantidad = parseInt(nuevaCantidad);
   if (cantidad < 1) return;
+
+  const item = itemsDelCarrito.find((i) => i.id === carritoId);
+  const stockDisponible = item.variantes_producto ? item.variantes_producto.stock : item.productos.stock;
+
+  if (cantidad > stockDisponible) {
+    alert(`Solo hay ${stockDisponible} disponibles de este producto.`);
+    cargarCarrito(); // recargamos para regresar el input al valor real
+    return;
+  }
 
   const { error } = await supabaseClient
     .from("carrito")
@@ -102,57 +114,11 @@ async function eliminarDelCarrito(carritoId) {
   }
 }
 
-// 6. Finalizar compra: crear el pedido y su detalle, luego vaciar el carrito
-async function finalizarCompra() {
-  const usuarioId = await verificarSesion();
-  if (!usuarioId) return;
-
+// 6. "Finalizar compra" ya no crea el pedido directo aquí:
+// ahora manda a la página de pago, donde se piden los datos y el método.
+function irAPagar() {
   if (itemsDelCarrito.length === 0) return;
-
-  const total = itemsDelCarrito.reduce(
-    (suma, item) => suma + item.productos.precio * item.cantidad,
-    0
-  );
-
-  // Paso A: crear el "recibo" general (pedido)
-  const { data: pedido, error: errorPedido } = await supabaseClient
-    .from("pedidos")
-    .insert({ usuario_id: usuarioId, total: total, estado: "pendiente" })
-    .select()
-    .single();
-
-  if (errorPedido) {
-    alert("Error al crear el pedido: " + errorPedido.message);
-    return;
-  }
-
-  // Paso B: crear una línea de detalle por cada producto del carrito
-  const detalles = itemsDelCarrito.map((item) => ({
-    pedido_id: pedido.id,
-    producto_id: item.productos.id,
-    cantidad: item.cantidad,
-    precio_unitario: item.productos.precio
-  }));
-
-  const { error: errorDetalle } = await supabaseClient
-    .from("detalle_pedido")
-    .insert(detalles);
-
-  if (errorDetalle) {
-    alert("Error al guardar el detalle del pedido: " + errorDetalle.message);
-    return;
-  }
-
-  // Paso C: vaciar el carrito, ya que se convirtió en un pedido
-  const idsCarrito = itemsDelCarrito.map((item) => item.id);
-  await supabaseClient.from("carrito").delete().in("id", idsCarrito);
-
-  alert("¡Compra realizada con éxito! Pedido #" + pedido.id);
-  cargarCarrito();
-
-  if (confirm("¿Quieres ver tu pedido en 'Mis pedidos' ahora?")) {
-    window.location.href = "mis-pedidos.html";
-  }
+  window.location.href = "pago.html";
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

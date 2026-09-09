@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pago - PoliMarket</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js" defer></script>
+  <script src="pago.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 30px auto; padding: 0 16px; }
+    input, textarea { display: block; width: 100%; margin-bottom: 12px; padding: 8px; box-sizing: border-box; }
+    label { display: block; margin-bottom: 4px; font-size: 14px; }
+    .metodos-pago { display: flex; gap: 16px; margin-bottom: 16px; }
+    #resumenCompra { border-bottom: 2px solid var(--color-acento-suave, #eee); padding-bottom: 12px; margin-bottom: 16px; }
+    #pantallaExito {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #pantallaExito h1 { color: #2f7a4d; }
+    .aviso-simulacion {
+      background: #fff3cd;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <nav><a href="carrito.html">← Volver al carrito</a></nav>
+
+  <h1>Confirmar y pagar</h1>
+
+  <div class="aviso-simulacion">
+    ⚠️ Esta es una simulación con fines escolares. No se procesa ningún pago real ni se guardan datos de tarjeta.
+  </div>
+
+  <div id="resumenCompra">
+    <!-- Se llena automáticamente desde pago.js -->
+  </div>
+
+  <div id="formPago">
+    <h2>Datos de envío</h2>
+    <label for="pagoNombre">Nombre completo</label>
+    <input type="text" id="pagoNombre">
+
+    <label for="pagoDireccion">Dirección de envío</label>
+    <textarea id="pagoDireccion" rows="2" placeholder="Calle, número, colonia, ciudad..."></textarea>
+
+    <h2>Método de pago</h2>
+    <div class="metodos-pago">
+      <label><input type="radio" name="metodoPago" value="efectivo" onchange="actualizarMetodoPago()" checked> Efectivo (contra entrega)</label>
+      <label><input type="radio" name="metodoPago" value="tarjeta" onchange="actualizarMetodoPago()"> Tarjeta</label>
+    </div>
+
+    <div id="camposTarjeta" style="display:none;">
+      <label for="tarjetaNumero">Número de tarjeta</label>
+      <input type="text" id="tarjetaNumero" placeholder="0000 0000 0000 0000" maxlength="19">
+
+      <label for="tarjetaVencimiento">Vencimiento</label>
+      <input type="text" id="tarjetaVencimiento" placeholder="MM/AA" maxlength="5">
+
+      <label for="tarjetaCvv">CVV</label>
+      <input type="text" id="tarjetaCvv" placeholder="123" maxlength="4">
+    </div>
+
+    <button onclick="confirmarPago()">Confirmar compra</button>
+  </div>
+
+  <div id="pantallaExito">
+    <h1>✅ ¡SU COMPRA HA SIDO EXITOSA!</h1>
+    <p>Su pedido <strong>#<span id="numeroPedidoExito"></span></strong> fue registrado correctamente.</p>
+    <button onclick="window.location.href='mis-pedidos.html'">Ver mis pedidos</button>
+    <button class="secundario" onclick="window.location.href='catalogo.html'">Seguir comprando</button>
+  </div>
+</body>
+</html>

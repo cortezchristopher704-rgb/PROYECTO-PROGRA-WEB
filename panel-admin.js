@@ -470,9 +470,9 @@ async function cargarPedidosAdmin() {
   const { data, error } = await supabaseClient
     .from("pedidos")
     .select(`
-      id, total, estado, creado_en,
+      id, total, estado, creado_en, direccion_envio, metodo_pago,
       perfiles ( nombre, apellido_paterno ),
-      detalle_pedido ( cantidad, precio_unitario, productos ( nombre ) )
+      detalle_pedido ( cantidad, precio_unitario, variante_valor, productos ( nombre ) )
     `)
     .order("creado_en", { ascending: false });
 
@@ -505,8 +505,10 @@ function renderizarPedidosAdmin(pedidos) {
     });
 
     const listaProductos = pedido.detalle_pedido
-      .map((l) => `${l.productos.nombre} x${l.cantidad}`)
+      .map((l) => `${l.productos.nombre}${l.variante_valor ? " (" + l.variante_valor + ")" : ""} x${l.cantidad}`)
       .join(", ");
+
+    const metodoTexto = pedido.metodo_pago === "tarjeta" ? "💳 Tarjeta" : pedido.metodo_pago === "efectivo" ? "💵 Efectivo" : "—";
 
     const opcionesSelect = opcionesEstado
       .map((op) => `<option value="${op}" ${op === pedido.estado ? "selected" : ""}>${op}</option>`)
@@ -517,6 +519,7 @@ function renderizarPedidosAdmin(pedidos) {
     tarjeta.innerHTML = `
       <p><strong>Pedido #${pedido.id}</strong> — ${nombreCliente} — ${fecha}</p>
       <p>Productos: ${listaProductos}</p>
+      ${pedido.direccion_envio ? `<p>Envío a: ${pedido.direccion_envio} — Pago: ${metodoTexto}</p>` : ""}
       <p>Total: $${pedido.total}</p>
       <label>Estado:
         <select onchange="actualizarEstadoPedido(${pedido.id}, this.value)">

@@ -5,6 +5,7 @@
 let productoActualId = null;
 let proveedorActualId = null;
 let esAdminActual = false;
+let variantesActuales = [];
 
 // 0. Checar (sin redirigir a nadie) si quien ve la página es admin
 async function verificarSiEsAdmin() {
@@ -58,17 +59,27 @@ async function cargarProducto() {
 async function cargarVariantesDetalle() {
   const { data, error } = await supabaseClient
     .from("variantes_producto")
-    .select("valor, stock")
+    .select("id, valor, stock")
     .eq("producto_id", productoActualId);
 
-  if (error || !data || data.length === 0) return;
+  if (error || !data || data.length === 0) {
+    variantesActuales = [];
+    return;
+  }
 
-  const opciones = data.map(v => `<option ${v.stock === 0 ? "disabled" : ""}>${v.valor}${v.stock === 0 ? " (agotado)" : ""}</option>`).join("");
+  variantesActuales = data;
+
+  const opciones = data.map(v =>
+    `<option value="${v.id}" ${v.stock === 0 ? "disabled" : ""}>${v.valor}${v.stock === 0 ? " (agotado)" : ""}</option>`
+  ).join("");
 
   const contenedor = document.getElementById("contenidoProducto");
   const selectorHtml = `
-    <label>Opciones disponibles:
-      <select id="selectorVariante">${opciones}</select>
+    <label>Opción: <span style="color:red">*elige una</span>
+      <select id="selectorVariante">
+        <option value="" disabled selected>Selecciona una opción</option>
+        ${opciones}
+      </select>
     </label><br><br>
   `;
   // Lo insertamos justo antes de los botones de acción
@@ -241,9 +252,34 @@ async function agregarAlCarritoDesdeDetalle() {
     return;
   }
 
+  let varianteId = null;
+
+  if (variantesActuales.length > 0) {
+    const selector = document.getElementById("selectorVariante");
+    if (!selector.value) {
+      alert("Selecciona una opción (color/talla) antes de agregar al carrito.");
+      return;
+    }
+    varianteId = parseInt(selector.value);
+
+    const variante = variantesActuales.find((v) => v.id === varianteId);
+    if (variante.stock <= 0) {
+      alert("Esa opción está agotada.");
+      return;
+    }
+  } else if (productoCompletoActual.stock <= 0) {
+    alert("Este producto está agotado.");
+    return;
+  }
+
   const { error } = await supabaseClient
     .from("carrito")
-    .insert({ usuario_id: sesion.session.user.id, producto_id: productoActualId, cantidad: 1 });
+    .insert({
+      usuario_id: sesion.session.user.id,
+      producto_id: productoActualId,
+      variante_id: varianteId,
+      cantidad: 1
+    });
 
   if (error) {
     alert("Error al agregar al carrito: " + error.message);

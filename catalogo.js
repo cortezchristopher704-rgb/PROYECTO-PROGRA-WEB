@@ -15,10 +15,12 @@ async function cargarProductos() {
       descripcion,
       precio,
       imagen_url,
+      stock,
       producto_categorias (
         categoria_id,
         categorias ( nombre )
-      )
+      ),
+      variantes_producto ( id )
     `)
     .eq("activo", true);
 
@@ -77,7 +79,12 @@ function renderizarProductos(lista) {
       <p><strong>$${producto.precio}</strong></p>
       <p class="categorias-texto">Categorías: ${nombresCategorias}</p>
       <a href="producto-detalle.html?id=${producto.id}">Ver detalle</a><br>
-      <button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>
+      ${producto.variantes_producto.length > 0
+        ? `<a href="producto-detalle.html?id=${producto.id}"><button>Elegir opción →</button></a>`
+        : producto.stock <= 0
+          ? `<button disabled>Agotado</button>`
+          : `<button onclick="agregarAlCarrito(${producto.id})">Agregar al carrito</button>`
+      }
       <button onclick="agregarAFavoritos(${producto.id})">❤ Favorito</button>
     `;
     contenedor.appendChild(tarjeta);
@@ -117,6 +124,12 @@ async function agregarAlCarrito(productoId) {
   if (!sesion.session) {
     alert("Debes iniciar sesión para agregar al carrito.");
     window.location.href = "login.html";
+    return;
+  }
+
+  const producto = todosLosProductos.find((p) => p.id === productoId);
+  if (producto.stock <= 0) {
+    alert("Este producto está agotado.");
     return;
   }
 

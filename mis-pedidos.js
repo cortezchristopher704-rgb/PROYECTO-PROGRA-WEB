@@ -18,8 +18,8 @@ async function cargarMisPedidos() {
   const { data, error } = await supabaseClient
     .from("pedidos")
     .select(`
-      id, total, estado, creado_en,
-      detalle_pedido ( cantidad, precio_unitario, productos ( nombre, imagen_url ) )
+      id, total, estado, creado_en, direccion_envio, metodo_pago,
+      detalle_pedido ( cantidad, precio_unitario, variante_valor, productos ( nombre, imagen_url ) )
     `)
     .order("creado_en", { ascending: false });
 
@@ -48,11 +48,13 @@ function renderizarPedidos(pedidos) {
     const filasProductos = pedido.detalle_pedido.map((linea) => `
       <div class="linea-pedido">
         <img src="${linea.productos.imagen_url}" alt="${linea.productos.nombre}">
-        <span>${linea.productos.nombre}</span>
+        <span>${linea.productos.nombre}${linea.variante_valor ? " — " + linea.variante_valor : ""}</span>
         <span>x${linea.cantidad}</span>
         <span>$${linea.precio_unitario}</span>
       </div>
     `).join("");
+
+    const metodoTexto = pedido.metodo_pago === "tarjeta" ? "💳 Tarjeta" : pedido.metodo_pago === "efectivo" ? "💵 Efectivo" : "";
 
     const tarjeta = document.createElement("div");
     tarjeta.className = "tarjeta-pedido";
@@ -63,6 +65,7 @@ function renderizarPedidos(pedidos) {
         <span class="estado estado-${pedido.estado}">${pedido.estado}</span>
       </div>
       ${filasProductos}
+      ${pedido.direccion_envio ? `<p style="font-size:13px; color:var(--color-texto-suave, #777);">📍 ${pedido.direccion_envio} ${metodoTexto ? "— " + metodoTexto : ""}</p>` : ""}
       <p class="total-pedido">Total: $${pedido.total}</p>
     `;
     contenedor.appendChild(tarjeta);
