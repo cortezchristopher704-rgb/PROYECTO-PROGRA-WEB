@@ -144,11 +144,15 @@ async function confirmarPago() {
 
   // Paso B.5: ahora sí, descontamos el stock de verdad, uno por producto/variante
   for (const item of itemsParaPagar) {
-    await supabaseClient.rpc("descontar_stock", {
+    const { error: errorStock } = await supabaseClient.rpc("descontar_stock", {
       p_producto_id: item.productos.id,
       p_variante_id: item.variantes_producto ? item.variantes_producto.id : null,
       p_cantidad: item.cantidad
     });
+
+    if (errorStock) {
+      console.error("Error al descontar stock:", errorStock.message);
+    }
   }
 
   // Paso C: vaciar el carrito
