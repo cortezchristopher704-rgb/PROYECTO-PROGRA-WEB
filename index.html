@@ -147,6 +147,18 @@
       #destacados { grid-template-columns: repeat(2, 1fr); }
       .drawer { width: min(280px, 85vw); }
     }
+    .badge-contador {
+      display: inline-block;
+      background: var(--color-acento, #D85A30);
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 999px;
+      padding: 1px 7px;
+      margin-left: 2px;
+    }
+    .badge-contador:empty { display: none; }
+
   </style>
 </head>
 <body>
@@ -163,8 +175,8 @@
     </div>
 
     <div id="accionesHeader">
-      <a href="carrito.html">🛒 Carrito</a>
-      <a href="favoritos.html">❤ Favoritos</a>
+      <a href="carrito.html">🛒 Carrito <span id="contadorCarrito" class="badge-contador"></span></a>
+      <a href="favoritos.html">❤ Favoritos <span id="contadorFavoritos" class="badge-contador"></span></a>
       <a href="mis-pedidos.html">📦 Mis pedidos</a>
     </div>
   </header>

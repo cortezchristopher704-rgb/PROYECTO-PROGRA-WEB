@@ -13,6 +13,23 @@ function cerrarDrawer() {
   document.getElementById("drawerOverlay").classList.remove("visible");
 }
 
+// 2.5 Mostrar cuántos items tienes en el carrito y en favoritos
+async function cargarContadores() {
+  const { data: sesion } = await supabaseClient.auth.getSession();
+  if (!sesion.session) return; // sin sesión, no hay nada que contar
+
+  const [carritoResult, favoritosResult] = await Promise.all([
+    supabaseClient.from("carrito").select("id", { count: "exact", head: true }),
+    supabaseClient.from("favoritos").select("id", { count: "exact", head: true })
+  ]);
+
+  const contadorCarrito = document.getElementById("contadorCarrito");
+  const contadorFavoritos = document.getElementById("contadorFavoritos");
+
+  if (carritoResult.count > 0) contadorCarrito.textContent = carritoResult.count;
+  if (favoritosResult.count > 0) contadorFavoritos.textContent = favoritosResult.count;
+}
+
 // 2. Llenar el ícono circular y el contenido del drawer,
 // según si hay sesión iniciada o no
 async function pintarCuenta() {
@@ -115,6 +132,7 @@ async function cargarDestacados() {
 
 document.addEventListener("DOMContentLoaded", () => {
   pintarCuenta();
+  cargarContadores();
   cargarCategoriasEnInicio();
   cargarDestacados();
 });

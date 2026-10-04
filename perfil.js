@@ -61,6 +61,39 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarMisResenas();
 });
 
+// Cambiar contraseña estando ya logueado
+// (reutiliza actualizarContrasena(), la misma función que ya usa
+// actualizar-contrasena.html para el flujo de "olvidé mi contraseña")
+async function cambiarContrasenaDesdePerfil() {
+  const nueva = document.getElementById("nuevaContrasenaPerfil").value;
+  const confirmar = document.getElementById("confirmarContrasenaPerfil").value;
+  const resultado = document.getElementById("resultadoContrasena");
+
+  if (nueva.length < 6) {
+    resultado.style.color = "red";
+    resultado.textContent = "La contraseña debe tener al menos 6 caracteres.";
+    return;
+  }
+
+  if (nueva !== confirmar) {
+    resultado.style.color = "red";
+    resultado.textContent = "Las contraseñas no coinciden.";
+    return;
+  }
+
+  const respuesta = await actualizarContrasena(nueva);
+
+  if (respuesta.exito) {
+    resultado.style.color = "green";
+    resultado.textContent = "¡Contraseña actualizada!";
+    document.getElementById("nuevaContrasenaPerfil").value = "";
+    document.getElementById("confirmarContrasenaPerfil").value = "";
+  } else {
+    resultado.style.color = "red";
+    resultado.textContent = "Error: " + respuesta.mensaje;
+  }
+}
+
 // ============================================
 // MIS RESEÑAS
 // ============================================

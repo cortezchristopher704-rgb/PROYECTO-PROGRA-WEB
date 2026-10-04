@@ -37,6 +37,15 @@
   <button onclick="guardarPerfil()">Guardar cambios</button>
 
   <hr style="margin: 30px 0;">
+  <h2>Cambiar contraseña</h2>
+  <label for="nuevaContrasenaPerfil">Nueva contraseña</label>
+  <input type="password" id="nuevaContrasenaPerfil" placeholder="Mínimo 6 caracteres">
+  <label for="confirmarContrasenaPerfil">Confirmar contraseña</label>
+  <input type="password" id="confirmarContrasenaPerfil" placeholder="Repite la contraseña">
+  <button onclick="cambiarContrasenaDesdePerfil()">Actualizar contraseña</button>
+  <p id="resultadoContrasena"></p>
+
+  <hr style="margin: 30px 0;">
   <h2>Mis reseñas</h2>
   <div id="listaMisResenas">
     <!-- Se llena automáticamente desde perfil.js -->
